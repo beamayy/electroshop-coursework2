@@ -522,7 +522,7 @@ public class ElectroShopClientApp extends JFrame {
 
         try {
             sendAndMaybeUpdateTable(
-                    Request.of(CommandType.DELETE_PRODUCT, sessionUser(), item.getId()),
+                    Request.of(CommandType.DELETE_PRODUCT, sessionUser(), (int) item.getId()),
                     false
             );
             loadProducts();
