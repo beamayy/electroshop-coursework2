@@ -60,7 +60,7 @@ public class SaleRepository {
     private String joinedSelect() {
         return """
                 SELECT t.id AS transaction_id, t.account_id, a.username, t.created_at, t.total_amount, t.customer_name,
-                       ti.inventory_id, ti.quantity, ti.unit_price, p.brand || ' ' || p.model AS product_name
+                       ti.inventory_id, ti.quantity, ti.unit_price, CONCAT(p.brand, ' ', p.model) AS product_name
                 FROM transactions t
                 JOIN accounts a ON a.id = t.account_id
                 LEFT JOIN transaction_items ti ON ti.transaction_id = t.id

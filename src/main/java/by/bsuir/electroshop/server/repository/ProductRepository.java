@@ -115,13 +115,23 @@ public class ProductRepository {
         );
     }
     public void deleteById(int id) {
-        String sql = "DELETE FROM hardware_inventories WHERE id = ?";
-        try (Connection conn = DatabaseManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        String sqlItems = "DELETE FROM transaction_items WHERE inventory_id = ?";
+        String sqlProduct = "DELETE FROM hardware_inventories WHERE id = ?";
+        try (Connection conn = DatabaseManager.getInstance().getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlItems);
+                 PreparedStatement ps2 = conn.prepareStatement(sqlProduct)) {
+                ps1.setInt(1, id);
+                ps1.executeUpdate();
+                ps2.setInt(1, id);
+                ps2.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException("Ошибка удаления товара", e);
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка удаления товара", e);
+            throw new RuntimeException("Ошибка подключения", e);
         }
     }
 }
