@@ -19,7 +19,7 @@ public class ProductRepository {
     }
 
     public List<InventoryItem> search(String keyword) throws SQLException {
-        String sql = baseSelect() + " WHERE lower(p.brand || ' ' || p.model || ' ' || c.name || ' ' || ifnull(p.technical_spec, '')) LIKE ? ORDER BY p.id";
+        String sql = baseSelect() + " WHERE LOWER(CONCAT(p.brand, ' ', p.model, ' ', c.name, ' ', IFNULL(p.technical_spec, ''))) LIKE ? ORDER BY p.id";
         try (Connection connection = DatabaseManager.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, "%" + keyword.toLowerCase() + "%");
