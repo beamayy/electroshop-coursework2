@@ -10,6 +10,7 @@ public enum CommandType implements Serializable {
     GET_MY_SALES,
     GET_ALL_SALES,
     CREATE_PRODUCT,
+    DELETE_PRODUCT,
     UPDATE_PRODUCT_PRICE,
     UPDATE_STOCK,
     CREATE_CATEGORY,

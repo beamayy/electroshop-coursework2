@@ -114,4 +114,14 @@ public class ProductRepository {
                 rs.getInt("warranty_months")
         );
     }
+    public void deleteById(int id) {
+        String sql = "DELETE FROM hardware_inventories WHERE id = ?";
+        try (Connection conn = DatabaseManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка удаления товара", e);
+        }
+    }
 }

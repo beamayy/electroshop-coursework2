@@ -39,7 +39,14 @@ public class InventoryService {
             return Response.error("Ошибка создания товара: " + e.getMessage());
         }
     }
-
+    public Response deleteProduct(int id) {
+        try {
+            productRepository.deleteById(id);
+            return Response.ok("Товар удалён");
+        } catch (Exception e) {
+            return Response.error("Ошибка удаления: " + e.getMessage());
+        }
+    }
     public Response updatePrice(UpdatePriceRequest request) {
         try {
             productRepository.updatePrice(request.productId(), request.newPrice());

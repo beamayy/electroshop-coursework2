@@ -33,6 +33,8 @@ public class RequestHandlerFactory {
         handlers.put(CommandType.GET_ALL_SALES, request -> requireRole(request, new Role[]{Role.ADMIN, Role.MANAGER}, saleService::getAllSales));
         handlers.put(CommandType.CREATE_PRODUCT, request -> requireRole(request, new Role[]{Role.ADMIN, Role.MANAGER},
                 () -> inventoryService.createProduct((ProductCreateRequest) request.getPayload())));
+        handlers.put(CommandType.DELETE_PRODUCT, request -> requireRole(request, new Role[]{Role.ADMIN, Role.MANAGER},
+                () -> inventoryService.deleteProduct((Integer) request.getPayload())));
         handlers.put(CommandType.UPDATE_PRODUCT_PRICE, request -> requireRole(request, new Role[]{Role.ADMIN, Role.MANAGER},
                 () -> inventoryService.updatePrice((UpdatePriceRequest) request.getPayload())));
         handlers.put(CommandType.UPDATE_STOCK, request -> requireRole(request, new Role[]{Role.ADMIN, Role.MANAGER},

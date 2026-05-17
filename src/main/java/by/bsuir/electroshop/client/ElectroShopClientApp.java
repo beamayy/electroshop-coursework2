@@ -224,7 +224,9 @@ public class ElectroShopClientApp extends JFrame {
         panel.add(createActionButton("Пополнить склад", this::updateStock), gbc);
         gbc.gridx = 4;
         panel.add(createActionButton("Редактировать товар", this::editProduct), gbc);
-
+        gbc.gridy = 4;
+        gbc.gridx = 3;
+        panel.add(createActionButton("Удалить товар", this::deleteProduct), gbc);
         gbc.gridy = 4;
         gbc.gridx = 0;
         panel.add(createActionButton("История продаж", this::loadAllSales), gbc);
@@ -446,9 +448,87 @@ public class ElectroShopClientApp extends JFrame {
 
     private void createProduct() {
         if (!checkLogin()) return;
-        ProductCreateRequest request = new ProductCreateRequest(1, "DemoBrand", "Model X", "220V", 123.45, 5, 12);
-        sendAndMaybeUpdateTable(Request.of(CommandType.CREATE_PRODUCT, sessionUser(), request), false);
-        loadProducts();
+
+        // Получаем список категорий для выпадающего списка
+        JTextField brandField = new JTextField(15);
+        JTextField modelField = new JTextField(15);
+        JTextField specField  = new JTextField(15);
+        JTextField priceField = new JTextField("0.00", 15);
+        JTextField stockField = new JTextField("0", 15);
+        JTextField warrantyField = new JTextField("12", 15);
+        JTextField categoryIdField = new JTextField("1", 5);
+
+        JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
+        form.add(new JLabel("ID категории:"));   form.add(categoryIdField);
+        form.add(new JLabel("Бренд:"));          form.add(brandField);
+        form.add(new JLabel("Модель:"));         form.add(modelField);
+        form.add(new JLabel("Характеристики:")); form.add(specField);
+        form.add(new JLabel("Цена:"));           form.add(priceField);
+        form.add(new JLabel("Остаток:"));        form.add(stockField);
+        form.add(new JLabel("Гарантия (мес.):")); form.add(warrantyField);
+
+        int result = JOptionPane.showConfirmDialog(this, form,
+                "Добавить товар", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) return;
+
+        // Валидация
+        if (brandField.getText().isBlank() || modelField.getText().isBlank()) {
+            JOptionPane.showMessageDialog(this, "Бренд и модель обязательны!", "Ошибка", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
+            int categoryId  = Integer.parseInt(categoryIdField.getText().trim());
+            double price    = Double.parseDouble(priceField.getText().trim());
+            int stock       = Integer.parseInt(stockField.getText().trim());
+            int warranty    = Integer.parseInt(warrantyField.getText().trim());
+
+            if (price < 0 || stock < 0 || warranty < 0) {
+                JOptionPane.showMessageDialog(this, "Цена, остаток и гарантия не могут быть отрицательными!", "Ошибка", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            ProductCreateRequest request = new ProductCreateRequest(
+                    categoryId,
+                    brandField.getText().trim(),
+                    modelField.getText().trim(),
+                    specField.getText().trim(),
+                    price, stock, warranty
+            );
+            sendAndMaybeUpdateTable(Request.of(CommandType.CREATE_PRODUCT, sessionUser(), request), false);
+            loadProducts();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Некорректные числовые данные!", "Ошибка", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void deleteProduct() {
+        if (!checkLogin()) return;
+
+        int row = inventoryTable.getSelectedRow();
+        if (row < 0) {
+            appendLine("Выберите товар для удаления");
+            return;
+        }
+
+        InventoryItem item = inventoryTableModel.getItem(inventoryTable.convertRowIndexToModel(row));
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Удалить товар: " + item.getBrand() + " " + item.getModel() + "?",
+                "Подтверждение удаления",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        try {
+            sendAndMaybeUpdateTable(
+                    Request.of(CommandType.DELETE_PRODUCT, sessionUser(), item.getId()),
+                    false
+            );
+            loadProducts();
+        } catch (Exception e) {
+            appendLine("Ошибка удаления: " + e.getMessage());
+        }
     }
 
     private void createUser() {
