@@ -72,23 +72,19 @@ public class SaleRepository {
         Map<Long, SaleTransaction> map = new LinkedHashMap<>();
         while (rs.next()) {
             long transactionId = rs.getLong("transaction_id");
-            SaleTransaction sale = map.computeIfAbsent(transactionId, id -> {
-                try {
-                    return new SaleTransaction(
-                            id,
-                            rs.getLong("account_id"),
-                            rs.getString("username"),
-                            LocalDateTime.parse(rs.getString("created_at")),
-                            rs.getDouble("total_amount"),
-                            rs.getString("customer_name")
-                    );
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            if (!map.containsKey(transactionId)) {
+                map.put(transactionId, new SaleTransaction(
+                        transactionId,
+                        rs.getLong("account_id"),
+                        rs.getString("username"),
+                        LocalDateTime.parse(rs.getString("created_at")),
+                        rs.getDouble("total_amount"),
+                        rs.getString("customer_name")
+                ));
+            }
             long inventoryId = rs.getLong("inventory_id");
             if (!rs.wasNull()) {
-                sale.getItems().add(new TransactionItem(
+                map.get(transactionId).getItems().add(new TransactionItem(
                         inventoryId,
                         rs.getString("product_name"),
                         rs.getInt("quantity"),
@@ -98,4 +94,3 @@ public class SaleRepository {
         }
         return new ArrayList<>(map.values());
     }
-}

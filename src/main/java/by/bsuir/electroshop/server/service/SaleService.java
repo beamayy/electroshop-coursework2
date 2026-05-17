@@ -62,6 +62,9 @@ public class SaleService {
             return Response.ok("История продаж сотрудника", new ArrayList<>(saleRepository.findSalesByUsername(username)));
         } catch (SQLException e) {
             return Response.error("Ошибка получения продаж: " + e.getMessage());
+        } catch (RuntimeException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            return Response.error("Ошибка чтения продаж: " + cause.getMessage());
         }
     }
 
@@ -70,6 +73,9 @@ public class SaleService {
             return Response.ok("Все продажи", new ArrayList<>(saleRepository.findAllSales()));
         } catch (SQLException e) {
             return Response.error("Ошибка получения продаж: " + e.getMessage());
+        } catch (RuntimeException e) {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            return Response.error("Ошибка чтения продаж: " + cause.getMessage());
         }
     }
 }
