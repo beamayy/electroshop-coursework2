@@ -38,6 +38,8 @@ public class ClientSession implements Runnable {
         } catch (EOFException ignored) {
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Ошибка клиентской сессии: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Неожиданная ошибка: " + (e.getMessage() != null ? e.getMessage() : e.getClass().getName()));
         }
     }
 }
