@@ -42,7 +42,7 @@ public class InventoryService {
     public Response deleteProduct(int id) {
         try {
             productRepository.deleteById(id);
-            return Response.ok("Товар удалён");
+            return Response.ok("Товар удалён",null);
         } catch (Exception e) {
             return Response.error("Ошибка удаления: " + e.getMessage());
         }
