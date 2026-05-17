@@ -77,7 +77,7 @@ public class SaleRepository {
                         transactionId,
                         rs.getLong("account_id"),
                         rs.getString("username"),
-                        LocalDateTime.parse(rs.getString("created_at")),
+                        LocalDateTime.parse(rs.getString("created_at").replace(' ', 'T')),
                         rs.getDouble("total_amount"),
                         rs.getString("customer_name")
                 ));
