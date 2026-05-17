@@ -94,3 +94,4 @@ public class SaleRepository {
         }
         return new ArrayList<>(map.values());
     }
+}
